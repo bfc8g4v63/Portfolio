@@ -1,0 +1,89 @@
+// Auto heal/atk/buff
+
+hwnd = 3147894
+AX = 1370
+AY = 1995
+BX = 1670
+BY = 1995
+CX = 1970
+CY = 1995
+DX = 2270
+DY = 1995
+EX = 2570
+EY = 1995
+
+Function IsColorSimilar(actualColor, targetColor)
+    Dim targetR, targetG, targetB
+    targetR = 74
+    targetG = 74
+    targetB = 74
+
+    Dim actualR, actualG, actualB
+    actualR = CInt("&H" & Mid(actualColor, 1, 2))
+    actualG = CInt("&H" & Mid(actualColor, 3, 2))
+    actualB = CInt("&H" & Mid(actualColor, 5, 2))
+
+    Dim tolerance
+    tolerance = 8
+
+    IsColorSimilar = (Abs(actualR - targetR) <= tolerance) And _
+                     (Abs(actualG - targetG) <= tolerance) And _
+                     (Abs(actualB - targetB) <= tolerance)
+End Function
+
+While True
+
+    If IsColorSimilar(GetPixelColor(AX, AY), "4A4A4A") Then
+        Call Plugin.Bkgnd.KeyPress(hwnd, 112)
+        Delay 150
+        Call Plugin.Bkgnd.LeftClick(hwnd, 2310, 2109)
+    ElseIf IsColorSimilar(GetPixelColor(BX, BY), "4A4A4A") Then
+        Call Plugin.Bkgnd.KeyPress(hwnd, 113)
+        Delay 150
+        Call Plugin.Bkgnd.LeftClick(hwnd, 2310, 2109)
+    ElseIf IsColorSimilar(GetPixelColor(CX, CY), "4A4A4A") Then
+        Call Plugin.Bkgnd.KeyPress(hwnd, 114)
+        Delay 150
+        Call Plugin.Bkgnd.LeftClick(hwnd, 2310, 2109)
+    ElseIf IsColorSimilar(GetPixelColor(DX, DY), "4A4A4A") Then
+        Call Plugin.Bkgnd.KeyPress(hwnd, 115)
+        Delay 150
+        Call Plugin.Bkgnd.LeftClick(hwnd, 2310, 2109)
+    ElseIf IsColorSimilar(GetPixelColor(EX, EY), "4A4A4A") Then
+        Call Plugin.Bkgnd.KeyPress(hwnd, 116)
+        Delay 150
+        Call Plugin.Bkgnd.LeftClick(hwnd, 2310, 2109)
+    
+    Else
+        Dim FoundA, FoundB, FoundC, FoundD, FoundE
+        Dim x, y
+        FoundA = FindPic(1595, 1500, 1630, 1540, "C:\Users\bfc8g\OneDrive\桌面\543\NG\Useing\ETES.bmp", 0.90, x, y)/
+        FoundB = FindPic(1595, 1500, 1630, 1540, "C:\Users\bfc8g\OneDrive\桌面\543\NG\Useing\ETEU.bmp", 0.90, x, y)
+        FoundC = FindPic(1590, 1490, 1730, 1630, "C:\Users\bfc8g\OneDrive\桌面\543\NG\Useing\D-Helm-b.bmp", 0.80, x, y)
+        FoundD = FindPic(1595, 1500, 1605, 1625, "C:\Users\bfc8g\OneDrive\桌面\543\NG\Useing\Legen-bit.bmp", 0.70, x, y)
+        FoundE = FindPic(1590, 1490, 1730, 1630, "C:\Users\bfc8g\OneDrive\桌面\543\NG\Useing\amulets0.bmp", 0.60, x, y)
+        If FoundA = 1 Then
+            Call Plugin.Bkgnd.KeyPress(hwnd, 89)
+        ElseIf FoundB = 1 Then
+            Call Plugin.Bkgnd.KeyPress(hwnd, 89)
+        ElseIf FoundC = 1 Then
+            Call Plugin.Bkgnd.KeyPress(hwnd, 89)
+        ElseIf FoundD = 1 Then
+            Call Plugin.Bkgnd.KeyPress(hwnd, 89)
+        ElseIf FoundE = 1 Then
+            Call Plugin.Bkgnd.KeyPress(hwnd, 89)
+        Else
+            Call Plugin.Bkgnd.KeyPress(hwnd, 78)
+        End If
+        Call Plugin.Bkgnd.KeyPress(hwnd, 49)
+        Delay 300
+        Call Plugin.Bkgnd.KeyPress(hwnd, 50)
+        Delay 300
+        Call Plugin.Bkgnd.KeyPress(hwnd, 51)
+        Delay 300
+    End If
+
+    Delay(CheckInterval)
+Wend
+
+
