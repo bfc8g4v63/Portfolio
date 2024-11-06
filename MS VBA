@@ -1,38 +1,38 @@
 //front page sheet
-Private Sub Worksheet_SelectionChange(ByVal Target As Range) '活頁簿內觸發目標巨集
+Private Sub Worksheet_SelectionChange(ByVal Target As Range) 
 
-    ' 宣告變數
+    
     Dim x As String  '宣告一個X變數 為文字
     x = Target.Address  '將游標點擊目標存入X
 
-    ' 檢查選定的單元格
+    
     If x = "$E$12" Then
-        ' 如果X = 鎖定的儲存格E12
+        
         Range("G12").Value = "入庫"  '於G12儲存格寫入"入庫"
     ElseIf x = "$F$12" Then
-        ' 否則如果X = 鎖定儲存格F12
+        
         Range("G12").Value = "出庫"  '於G12儲存格寫入"出庫"
     End If
 
-    ' 檢查選定的單元格是否在H列
+    
     If Not Intersect(Target, Me.Columns("H")) Is Nothing Then
-        ' 宣告變數
+        
         Dim wsInventory As Worksheet
         Dim searchValue As String
         Dim foundCell As Range
 
-        ' 確認Target只有一個單元格，並且其值是數字或文字
+        
         If Target.Cells.Count = 1 And Not IsEmpty(Target.Value) Then
-            ' 取得選定單元格的值，並將其轉換為字符串
+            
             searchValue = CStr(Target.Value)
             
-            ' 設定工作表
+            
             Set wsInventory = ThisWorkbook.Sheets("出入庫")
             
-            ' 在出入庫工作表中搜索相符的值
+            
             Set foundCell = wsInventory.Columns("H").Find(What:=searchValue, LookIn:=xlValues, LookAt:=xlWhole)
             
-            ' 如果找到相符的單元格，跳轉到該單元格
+            
             If Not foundCell Is Nothing Then
                 Application.Goto foundCell, True
             Else
