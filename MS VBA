@@ -2,7 +2,7 @@
 Private Sub Worksheet_SelectionChange(ByVal Target As Range) 
 
     
-    Dim x As String  '宣告一個X變數 為文字
+    Dim x As String  
     x = Target.Address  '將游標點擊目標存入X
 
     
