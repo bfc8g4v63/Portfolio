@@ -3,15 +3,15 @@ Private Sub Worksheet_SelectionChange(ByVal Target As Range)
 
     
     Dim x As String  
-    x = Target.Address  '將游標點擊目標存入X
+    x = Target.Address  
 
     
     If x = "$E$12" Then
         
-        Range("G12").Value = "入庫"  '於G12儲存格寫入"入庫"
+        Range("G12").Value = "入庫"  
     ElseIf x = "$F$12" Then
         
-        Range("G12").Value = "出庫"  '於G12儲存格寫入"出庫"
+        Range("G12").Value = "出庫"  
     End If
 
     
