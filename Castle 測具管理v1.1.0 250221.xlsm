@@ -1,0 +1,480 @@
+Sub 清除()
+
+Range("E4").Value = Date
+Range("E6:F6").ClearContents
+Range("E14:F14").ClearContents
+Range("E14:F14").ClearContents
+Range("E22:F22").ClearContents
+Range("A26:I50").ClearContents
+
+End Sub
+
+Sub 清除建立料號()
+
+Range("K6:N6").ClearContents
+Range("K8:N8").ClearContents
+Range("K10:N10").ClearContents
+Range("K12:N12").ClearContents
+Range("K14:N14").ClearContents
+Range("K16:N16").ClearContents
+Range("K18:N18").ClearContents
+
+End Sub
+
+Sub 建立料號()
+
+    Dim wsStock As Worksheet
+    Dim wsOnline As Worksheet
+    Dim wsRJ As Worksheet
+    Dim wsDefective As Worksheet
+    Dim wsForm As Worksheet
+    Dim x As Long
+    Dim partNumber As String
+    Dim isDuplicate As Boolean
+    Dim isLocationDuplicate As Boolean
+    Dim isDefectiveLocationDuplicate As Boolean
+    Dim rng As Range
+    Dim cell As Range
+    Dim location As String
+    Dim defectiveLocation As String
+    
+
+    Set wsStock = Sheets("治具庫")
+    Set wsOnline = Sheets("線上")
+    Set wsRJ = Sheets("睿均")
+    Set wsDefective = Sheets("不良品")
+    Set wsForm = Sheets("首頁")
+    
+
+    If Len(wsForm.Range("K6").Value) <> 12 Then
+        MsgBox "料號 至少為12碼且必須為數字 !", vbExclamation, "錯誤"
+        Exit Sub
+    End If
+
+    partNumber = wsForm.Range("K6").Value
+
+
+    Set rng = wsStock.Range("A1:A" & wsStock.Cells(Rows.Count, 1).End(xlUp).Row)
+    isDuplicate = False
+    
+    For Each cell In rng
+        If cell.Value = partNumber Then
+            isDuplicate = True
+            Exit For
+        End If
+    Next cell
+    
+    If isDuplicate Then
+        MsgBox "料號已重複", vbExclamation, "錯誤"
+        Exit Sub
+    End If
+
+
+    If wsForm.Range("K8").Value = "" Then
+        MsgBox "品名 不能為空", vbExclamation, "錯誤"
+        Exit Sub
+    End If
+
+
+    If wsForm.Range("K10").Value = "" Then
+        MsgBox "規格 不能為空", vbExclamation, "錯誤"
+        Exit Sub
+    End If
+
+
+    location = wsForm.Range("K12").Value
+    If location = "" Then
+        MsgBox "儲位 不能為空", vbExclamation, "錯誤"
+        Exit Sub
+    End If
+    
+
+    Set rng = wsStock.Range("E1:E" & wsStock.Cells(Rows.Count, 5).End(xlUp).Row)
+    isLocationDuplicate = False
+    For Each cell In rng
+        If Trim(cell.Value) = Trim(location) Then
+            isLocationDuplicate = True
+            Exit For
+        End If
+    Next cell
+    
+    If isLocationDuplicate Then
+        MsgBox "儲位已重複", vbExclamation, "錯誤"
+        Exit Sub
+    End If
+
+
+    defectiveLocation = wsForm.Range("K14").Value
+    If defectiveLocation = "" Then
+        MsgBox "不良品儲位 不能為空", vbExclamation, "錯誤"
+        Exit Sub
+    End If
+
+
+    Set rng = wsDefective.Range("E1:E" & wsDefective.Cells(Rows.Count, 5).End(xlUp).Row)
+    isDefectiveLocationDuplicate = False
+    For Each cell In rng
+        If Trim(cell.Value) = Trim(defectiveLocation) Then
+            isDefectiveLocationDuplicate = True
+            Exit For
+        End If
+    Next cell
+    
+    If isDefectiveLocationDuplicate Then
+        MsgBox "不良品儲位已重複", vbExclamation, "錯誤"
+        Exit Sub
+    End If
+
+    x = wsStock.Cells(Rows.Count, 1).End(xlUp).Row + 1
+    wsStock.Cells(x, 1).Value = partNumber
+    wsStock.Cells(x, 2).Value = wsForm.Range("K8").Value
+    wsStock.Cells(x, 3).Value = wsForm.Range("K10").Value
+    wsStock.Cells(x, 5).Value = location
+
+
+    x = wsOnline.Cells(Rows.Count, 1).End(xlUp).Row + 1
+    wsOnline.Cells(x, 1).Value = partNumber
+    wsOnline.Cells(x, 2).Value = wsForm.Range("K8").Value
+    wsOnline.Cells(x, 3).Value = wsForm.Range("K10").Value
+
+
+    x = wsRJ.Cells(Rows.Count, 1).End(xlUp).Row + 1
+    wsRJ.Cells(x, 1).Value = partNumber
+    wsRJ.Cells(x, 2).Value = wsForm.Range("K8").Value
+    wsRJ.Cells(x, 3).Value = wsForm.Range("K10").Value
+
+
+    x = wsDefective.Cells(Rows.Count, 1).End(xlUp).Row + 1
+    wsDefective.Cells(x, 1).Value = partNumber
+    wsDefective.Cells(x, 2).Value = wsForm.Range("K8").Value
+    wsDefective.Cells(x, 3).Value = wsForm.Range("K10").Value
+    wsDefective.Cells(x, 5).Value = defectiveLocation
+
+
+    MsgBox "料號已新增至各庫! (含不良品儲位)", vbInformation, "完成"
+
+
+    Call 清除建立料號
+
+End Sub
+
+
+Sub 產生料號()
+
+    Dim wsInventory As Worksheet
+    Dim inventoryRange As Range
+    Dim uniqueNumber As Double
+    Dim isUnique As Boolean
+    Dim cell As Range
+    
+    Set wsInventory = ThisWorkbook.Sheets("治具庫")
+    
+    Set inventoryRange = wsInventory.Range("A1", wsInventory.Cells(wsInventory.Rows.Count, "A").End(xlUp))
+    
+    uniqueNumber = 990000000001#
+    
+    Do
+
+        isUnique = True
+        
+
+        For Each cell In inventoryRange
+            If cell.Value = uniqueNumber Then
+                isUnique = False
+                Exit For
+            End If
+        Next cell
+        
+        If Not isUnique Then uniqueNumber = uniqueNumber + 1
+    Loop While Not isUnique
+    
+
+    ThisWorkbook.ActiveSheet.Range("K6").Value = uniqueNumber
+
+End Sub
+
+
+Sub 出入庫()
+
+    Dim wsForm As Worksheet
+    Dim wsStock As Worksheet
+    Dim x As Long
+    Dim dataFields(1 To 9) As String
+    Dim fieldNames As Variant
+    Dim i As Integer
+    Dim confirmationMessage As String
+    Dim response As VbMsgBoxResult
+    Dim stockQuantity As Double
+    Dim outputQuantity As Double
+    Dim validOutSources As Variant
+    Dim validInSources As Variant
+    Dim isValidSource As Boolean
+    Dim storageCode As String
+    Dim regexPattern As Object
+
+    Set wsForm = Sheets("首頁")
+    Set wsStock = Sheets("出入庫")
+
+    fieldNames = Array("日期", "料號", "品名", "規格", "出入庫", "數量", "來源", "儲位", "存放區")
+    dataFields(1) = wsForm.Range("E4").Value ' 日期
+    dataFields(2) = wsForm.Range("E6").Value ' 料號
+    dataFields(3) = wsForm.Range("E8").Value ' 品名
+    dataFields(4) = wsForm.Range("E10").Value ' 規格
+    dataFields(5) = wsForm.Range("G12").Value ' 出入庫
+    dataFields(6) = wsForm.Range("E14").Value ' 數量
+    dataFields(7) = wsForm.Range("E16").Value ' 來源
+    dataFields(8) = wsForm.Range("E18").Value ' 儲位
+    dataFields(9) = wsForm.Range("E22").Value ' 不良品儲位
+
+
+    If Trim(dataFields(2)) = "" Then
+        MsgBox "料號 欄位不得為空！", vbExclamation, "錯誤"
+        Exit Sub
+    ElseIf Len(dataFields(2)) <> 12 Or Not IsNumeric(dataFields(2)) Then
+        MsgBox "料號 必須為12碼的數字！", vbExclamation, "錯誤"
+        Exit Sub
+    End If
+
+
+    If Not IsNumeric(dataFields(6)) Then
+        MsgBox "數量 必須為數字！", vbExclamation, "錯誤"
+        Exit Sub
+    End If
+
+
+    For i = LBound(dataFields) To UBound(dataFields) - 1
+        If Trim(dataFields(i)) = "" Then
+            MsgBox fieldNames(i - 1) & " 欄位不得為空！", vbExclamation, "錯誤"
+            Exit Sub
+        End If
+    Next i
+
+
+    validOutSources = Array("線上", "睿均", "不良品")
+    validInSources = Array("新購", "盤點", "退庫")
+
+    isValidSource = False
+
+    If Trim(dataFields(5)) = "出庫" Then
+        For i = LBound(validOutSources) To UBound(validOutSources)
+            If Trim(dataFields(7)) = validOutSources(i) Then
+                isValidSource = True
+                Exit For
+            End If
+        Next i
+        If Not isValidSource Then
+            MsgBox "來源 (" & dataFields(7) & ") 不可出庫！必須是：線上、睿均、不良品。", vbExclamation, "錯誤"
+            Exit Sub
+        End If
+    ElseIf Trim(dataFields(5)) = "入庫" Then
+        For i = LBound(validInSources) To UBound(validInSources)
+            If Trim(dataFields(7)) = validInSources(i) Then
+                isValidSource = True
+                Exit For
+            End If
+        Next i
+        If Not isValidSource Then
+            MsgBox "來源 (" & dataFields(7) & ") 不可入庫！必須是：新購、盤點、退庫。", vbExclamation, "錯誤"
+            Exit Sub
+        End If
+    End If
+
+
+    If Trim(dataFields(5)) = "出庫" And Trim(dataFields(7)) = "不良品" Then
+        storageCode = Trim(dataFields(9))
+        
+  
+        Set regexPattern = CreateObject("VBScript.RegExp")
+        regexPattern.Pattern = "^N\d{3}$"
+        regexPattern.IgnoreCase = False
+        regexPattern.Global = False
+        
+        If Not regexPattern.Test(storageCode) Then
+            MsgBox "不良品儲位 (" & storageCode & ") 必須為 N001 ~ N999！", vbExclamation, "錯誤"
+            Exit Sub
+        End If
+    End If
+
+
+    stockQuantity = wsForm.Range("E20").Value
+    outputQuantity = CDbl(dataFields(6))
+
+    If Trim(dataFields(5)) = "出庫" Then
+        If stockQuantity - outputQuantity < 0 Then
+            MsgBox "庫存不足！庫存量 (" & stockQuantity & ") 小於出庫數量 (" & outputQuantity & ")。", vbExclamation, "錯誤"
+            Exit Sub
+        End If
+    End If
+
+
+    confirmationMessage = "以下資料將被寫入到『出入庫』工作表：" & vbCrLf & vbCrLf
+    For i = LBound(dataFields) To UBound(dataFields)
+        confirmationMessage = confirmationMessage & fieldNames(i - 1) & ": " & dataFields(i) & vbCrLf
+    Next i
+    confirmationMessage = confirmationMessage & vbCrLf & "是否確認？"
+
+    response = MsgBox(confirmationMessage, vbYesNo + vbQuestion, "確認寫入")
+
+    If response = vbNo Then
+        MsgBox "操作已取消！", vbInformation, "取消"
+        Exit Sub
+    End If
+
+
+    x = WorksheetFunction.CountA(wsStock.Range("A:A")) + 1
+    wsStock.Cells(x, 1).Value = dataFields(1) ' 日期
+    wsStock.Cells(x, 2).Value = dataFields(2) ' 料號
+    wsStock.Cells(x, 3).Value = dataFields(3) ' 品名
+    wsStock.Cells(x, 4).Value = dataFields(4) ' 規格
+    wsStock.Cells(x, 5).Value = dataFields(5) ' 出入庫
+    wsStock.Cells(x, 6).Value = dataFields(6) ' 數量
+    wsStock.Cells(x, 7).Value = dataFields(7) ' 來源
+    wsStock.Cells(x, 8).Value = dataFields(8) ' 儲位
+    wsStock.Cells(x, 9).Value = dataFields(9) ' 不良品儲位
+
+
+    Call 清除
+
+    MsgBox "資料已成功寫入到『出入庫』工作表！", vbInformation, "完成"
+
+End Sub
+
+Sub 產生儲位()
+
+    Dim wsA As Worksheet
+    Dim wsB As Worksheet
+    Dim wsC As Worksheet
+    Dim rng As Range
+    Dim cell As Range
+    Dim uniqueNumber As Long
+    Dim isDuplicate As Boolean
+    Dim existingValues As Object
+    Dim i As Integer
+    Dim newValue As String
+
+    ' 設定工作表
+    Set wsA = Sheets("首頁")    ' 首頁
+    Set wsB = Sheets("治具庫")  ' 正常品儲位
+    Set wsC = Sheets("不良品")  ' 不良品儲位
+
+    ' 取得 E 欄已有的正常品儲位範圍
+    Set rng = wsB.Range("E1:E" & wsB.Cells(wsB.Rows.Count, "E").End(xlUp).Row)
+
+    ' 產生唯一的正常品儲位號碼
+    uniqueNumber = 1
+    isDuplicate = True
+
+    Do While isDuplicate
+        isDuplicate = False
+        For Each cell In rng
+            If IsNumeric(cell.Value) And Not IsEmpty(cell.Value) Then
+                If cell.Value = uniqueNumber Then
+                    isDuplicate = True
+                    uniqueNumber = uniqueNumber + 1
+                    Exit For
+                End If
+            End If
+        Next cell
+    Loop
+
+    ' 將正常品儲位號碼寫入首頁 K12
+    wsA.Range("K12").Value = uniqueNumber
+
+    ' ==========================
+    ' 產生不良品儲位
+    ' ==========================
+
+    ' 創建 Dictionary 來存儲已存在的不良品儲位
+    Set existingValues = CreateObject("Scripting.Dictionary")
+
+    ' 取得 E 欄已有的不良品儲位範圍
+    Set rng = wsC.Range("E2:E" & wsC.Cells(wsC.Rows.Count, 5).End(xlUp).Row)
+    For Each cell In rng
+        If Not IsEmpty(cell.Value) Then
+            existingValues(cell.Value) = True
+        End If
+    Next cell
+
+    ' 產生唯一的不良品儲位編號 (格式: N001, N002, ...)
+    For i = 1 To 999
+        newValue = "N" & Format(i, "000")
+        If Not existingValues.exists(newValue) Then
+            Exit For
+        End If
+    Next i
+
+    ' 將不良品儲位號碼寫入首頁 K14
+    wsA.Range("K14").Value = newValue
+
+    ' 清除 Dictionary
+    Set existingValues = Nothing
+
+    ' 顯示訊息
+    'MsgBox "已產生儲位：" & uniqueNumber & vbNewLine & "不良品儲位：" & newValue, vbInformation, "完成"
+
+End Sub
+
+
+
+
+Sub 查詢()
+    Call 清除查詢
+    
+    Dim wsForm As Worksheet
+    Dim wsInventory As Worksheet
+    Dim searchValue As String
+    Dim lastRow As Long
+    Dim filteredRange As Range
+    Dim i As Long
+    
+    Set wsForm = ThisWorkbook.Sheets("首頁")
+    Set wsInventory = ThisWorkbook.Sheets("出入庫")
+    
+    searchValue = wsForm.Range("E6").Value
+    
+    If Len(searchValue) = 0 Then
+        MsgBox "料號不能為空。", vbExclamation
+        Exit Sub
+    End If
+    
+    lastRow = wsInventory.Cells(wsInventory.Rows.Count, "B").End(xlUp).Row
+    
+    For i = 1 To lastRow
+        If wsInventory.Cells(i, 2).Value = searchValue Then
+            If filteredRange Is Nothing Then
+                Set filteredRange = wsInventory.Rows(i)
+            Else
+                Set filteredRange = Union(filteredRange, wsInventory.Rows(i))
+            End If
+        End If
+        
+        If Not filteredRange Is Nothing Then
+            If filteredRange.Rows.Count >= 10 Then Exit For
+        End If
+    Next i
+    
+    If Not filteredRange Is Nothing Then
+        Dim startCell As Range
+        Set startCell = wsForm.Range("A26")
+        
+        startCell.Resize(filteredRange.Rows.Count, filteredRange.Columns.Count).ClearContents
+        
+        filteredRange.Copy
+        startCell.PasteSpecial Paste:=xlPasteValues
+        
+        Application.CutCopyMode = False
+    Else
+        MsgBox "該料件無庫存或無此料號。", vbExclamation
+    End If
+End Sub
+
+Sub 清除查詢()
+    Dim wsForm As Worksheet
+    Set wsForm = ThisWorkbook.Sheets("首頁")
+    
+
+    wsForm.Range("A26:K35").ClearContents
+    
+End Sub
+
+
