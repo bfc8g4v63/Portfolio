@@ -255,8 +255,6 @@ Sub 查詢()
     End If
 End Sub
 
-
-
 Sub 產生料號()
 
     Dim wsInventory As Worksheet
