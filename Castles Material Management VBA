@@ -1,3 +1,16 @@
+
+Private Sub Worksheet_SelectionChange(ByVal Target As Range)
+    Dim x As String
+    x = Target.Address
+
+    If x = "$E$12" Then
+        Range("G12").Value = "入庫"
+    ElseIf x = "$F$12" Then
+        Range("G12").Value = "出庫"
+    End If
+End Sub
+'fronpage
+
 Sub 清除()
     Dim ws As Worksheet
     Set ws = ThisWorkbook.Sheets("首頁")
